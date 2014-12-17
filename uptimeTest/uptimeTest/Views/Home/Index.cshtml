@@ -1,0 +1,100 @@
+﻿
+<style type="text/css">
+    .price {
+        float: left;
+    }
+
+    .currency {
+        float: right;
+    }
+
+    .priceLoading {
+        display: none;
+
+    }
+
+    .priceLocation { }
+
+    .btnsubmit {
+        display: none
+    }
+
+    .calculatedPrice {
+        display:none
+    }
+
+    .priceNew {
+        float: left;
+        
+    }
+
+    .currencyNew {
+        float: right;
+        
+    }
+</style>
+@using uptimeTest.Extensions
+
+@model uptimeTest.Models.SearchModel
+@using (Html.BeginForm("Index", "Home", FormMethod.Post))
+{
+    <p>
+        @Html.TextBox("Search", Model.Search)
+        <input type="submit" id="submitId" value="Search" />
+    </p>
+}
+@if (Model.Items.Count > 0)
+{
+    
+    <table>
+        <tr>
+            <td></td>
+            <td>
+                @using (Ajax.BeginForm("ChangeCurrency", "Home", new AjaxOptions() { UpdateTargetId = "SelectedCurrency", OnBegin = "HideFieldsShowLoading", OnSuccess = "updateSuccess", OnFailure ="updatefailed", InsertionMode = InsertionMode.InsertAfter }))
+                {
+                    @Html.HiddenFor(m => m.Currencies)
+                    @Html.DropDownList("SelectedCurrency", new SelectList(Model.AllCurrencies), string.Empty, new { onchange = "$('.btnsubmit').click();" })
+    <input type="submit" id="submitId" class="btnsubmit"/>
+
+                }
+
+            </td>
+        </tr>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    <a href="@item.GetDetailPageURL()">@item.ItemAttributes.Title</a>
+                </td>
+                <td>
+                    <div class="priceLocation">
+                        <div id="@item.ASIN" class="price">@item.GetPrice().Item1</div><div id="@item.GenerateOldCurrencyId()" class="currency">@item.GetPrice().Item2</div>
+                    </div>
+                    <div class="calculatedPrice">
+                        <div id="@item.GeneratenewPriceId()" class="priceNew">@item.GetPrice().Item1</div><div id="@item.GeneratenewCurrencyId()" class="currencyNew"></div>
+                    </div>
+                    <div class="priceLoading">
+                        loading...
+                    </div>
+                </td>
+            </tr>
+        }
+    </table>
+    if (Model.CurrentPage != 0)
+    {
+        for (var i = 0; i < @Model.TotalPages && i < 4; i++)
+        {
+            if (Model.CurrentPage == (i + 1))
+            {
+                var pagestring = (i + 1).ToString();
+                @pagestring
+            }
+            else
+            {
+                @Html.ActionLink((@i + 1).ToString(), "Index", new { page = (@i + 1).ToString(), search = Model.Search })
+            }
+        }
+    }
+}
+
+
