@@ -20,7 +20,7 @@ namespace uptimeTest.Controllers
 
         [Inject]
         public ICurrencyRepository CurrencyRepository { get; set; }
-        public ActionResult Index(SearchModel model, string page, string search = "potter")
+        public ActionResult Index(SearchModel model, string page, string search)
         {
             foreach (var value in Enum.GetValues(typeof(Currency)))
             {
